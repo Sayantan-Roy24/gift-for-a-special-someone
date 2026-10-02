@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday, Ananya!</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+      color: #4a4a4a;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      padding-bottom: 60px;
+    }
+
+    /* Floating Hearts Background */
+    .bg-hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .heart-particle {
+      position: absolute;
+      color: rgba(255, 182, 193, 0.6);
+      font-size: 1.5rem;
+      animation: floatUp 8s infinite linear;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    /* Lock Screen Overlay */
+    #lock-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2000;
+      background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .lock-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 40px 30px;
+      border-radius: 28px;
+      box-shadow: 0 15px 35px rgba(238, 156, 167, 0.3);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+    .lock-badge {
+      display: inline-block;
+      background: #fff0f3;
+      color: #d63384;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      border: 1px dashed #ffb6c1;
+    }
+    .lock-card h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.8rem;
+      color: #d63384;
+      margin-bottom: 8px;
+    }
+    .lock-card p {
+      font-size: 0.95rem;
+      color: #6c757d;
+      margin-bottom: 25px;
+    }
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    input[type="password"], input[type="text"] {
+      width: 100%;
+      padding: 14px 20px;
+      border: 2px solid #ffb6c1;
+      border-radius: 16px;
+      outline: none;
+      font-size: 1rem;
+      text-align: center;
+      transition: border-color 0.3s;
+      font-family: 'Poppins', sans-serif;
+    }
+    input:focus {
+      border-color: #d63384;
+    }
+  .btn-unlock {
+      background: linear-gradient(45deg, #ff6b81, #d63384);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 25px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(214, 51, 132, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    .btn-unlock:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(214, 51, 132, 0.4);
+    }
+
+    /* Audio Player Widget */
+    #audio-control {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 8px 20px rgba(214, 51, 132, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      font-weight: 600;
+      color: #d63384;
+      transition: transform 0.2s, background 0.2s;
+    }
+    #audio-control:hover {
+      transform: scale(1.05);
+      background: #fff;
+    }
+
+/* Container & Cards */
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+.badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.9);
+  color: #d63384;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid rgba(214, 51, 132, 0.2);
+}
+header h1 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 3.8rem;
+  color: #d63384;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 35px 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  text-align: center;
+  box-sizing: border-box;
+}
+.card h2 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2.4rem;
+  color: #d63384;
+  margin-bottom: 15px;
+}
+
+    /* Enhanced Multi-Tier Cake */
+    .cake-container {
+      margin: 40px auto 20px;
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+    }
+    .cake-3d {
+      position: relative;
+      width: 180px;
+      height: 120px;
+      margin: 0 auto;
+    }
+    .layer-bottom {
+      width: 180px;
+      height: 50px;
+      background: linear-gradient(to right, #f48fb1, #f06292);
+      border-radius: 12px 12px 16px 16px;
+      position: absolute;
+      bottom: 0;
+      box-shadow: inset 0 -8px 0 rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.1);
+    }
+    .layer-top {
+      width: 130px;
+      height: 45px;
+      background: linear-gradient(to right, #ff80ab, #ff4081);
+      border-radius: 10px 10px 12px 12px;
+      position: absolute;
+      bottom: 50px;
+      left: 25px;
+      box-shadow: inset 0 -6px 0 rgba(0,0,0,0.08);
+    }
+    .icing-drip {
+      width: 100%;
+      height: 12px;
+      background: #ffffff;
+      border-radius: 0 0 8px 8px;
+      position: absolute;
+      top: 0;
+    }
+    .candle {
+      width: 10px;
+      height: 34px;
+      background: repeating-linear-gradient(45deg, #a5d6a7, #a5d6a7 5px, #81c784 5px, #81c784 10px);
+      position: absolute;
+      top: -34px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 4px;
+    }
+    .flame {
+      width: 14px;
+      height: 22px;
+      background: #ffca28;
+      border-radius: 50% 50% 20% 20%;
+      position: absolute;
+      top: -20px;
+      left: -2px;
+      box-shadow: 0 0 14px #ffca28, 0 0 25px #ffb300;
+      animation: flicker 0.6s infinite alternate;
+    }
+    @keyframes flicker {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.25); }
+    }
+
+/* Polaroid Photo Gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-top: 25px;
+  padding-bottom: 25px;
+}
+.polaroid {
+  background: #fff;
+  padding: 10px 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  transform: rotate(-2deg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+.polaroid:nth-child(even) {
+  transform: rotate(2deg);
+}
+.polaroid.centered-last {
+  grid-column: 2;
+}
+.polaroid-img {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 6px;
+  background: #ffe6ea;
+}
+@media (max-width: 600px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+  .polaroid.centered-last {
+    grid-column: auto;
+  }
+}
+    .polaroid {
+      background: #fff;
+      padding: 12px 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      transform: rotate(-2deg);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .polaroid:nth-child(even) { transform: rotate(2deg); }
+    .polaroid:hover {
+      transform: scale(1.05) rotate(0deg);
+      box-shadow: 0 15px 30px rgba(214, 51, 132, 0.2);
+    }
+  .polaroid-img {
+      display: block;
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 6px;
+      background: #ffe6ea;
+    }
+    .polaroid p {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.4rem;
+      color: #444;
+      margin-top: 12px;
+    }
+
+    /* Flip Cards Section */
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .flip-card {
+      background-color: transparent;
+      height: 120px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+    }
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-front, .flip-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      font-size: 0.9rem;
+    }
+    .flip-front {
+      background: #fff0f3;
+      color: #d63384;
+      font-weight: 600;
+      border: 1px dashed #ffb6c1;
+    }
+    .flip-back {
+      background: linear-gradient(45deg, #ff6b81, #d63384);
+      color: white;
+      transform: rotateY(180deg);
+      font-weight: 200;
+    }
+
+    /* Love Letter Envelope */
+    .envelope {
+      background: #fff0f3;
+      border: 2px dashed #ffb6c1;
+      padding: 25px;
+      border-radius: 16px;
+      max-width: 650px;
+      margin: 20px auto 0;
+      text-align: left;
+      line-height: 1.8;
+      font-size: 1rem;
+      color: #4a4a4a;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 12px 26px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      z-index: 3000;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Hearts Background -->
+  <div class="bg-hearts" id="hearts-bg"></div>
+
+  <!-- Lock Screen Overlay -->
+  <div id="lock-screen">
+    <div class="lock-card">
+      <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+      
+      <h1>For Miss. Kudtarkar</h1>
+      <p>(the password is something i call you by btw)</p>
+
+      <div class="input-group">
+        <input type="password" id="passcode-input" placeholder="Jaldi Likho..." onkeydown="if(event.key === 'Enter') unlockSite()">
+      </div>
+
+      <button class="btn-unlock" onclick="unlockSite()">Khul Ja Sim Sim 🔑</button>
+    </div>
+  </div>
+
+  <!-- Audio Player Widget -->
+  <button id="audio-control" onclick="toggleAudio()">
+    🎵 <span id="audio-label">Play Song</span>
+  </button>
+  <audio id="bg-music" loop>
+    <source src="Cigarettes After Sex - Apocalypse (Lyrics).mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="container hidden" id="main-site">
+    <header>
+      <div class="badge">for bananya ✨</div>
+      <h1>Happy Birthday, Meri Ananya! 🎉</h1>
+      <p>For my one and only...</p>
+    </header>
+
+    <!-- Birthday Cake Section -->
+    <div class="card">
+      <h2>Blow out the candles cutie 🎂</h2>
+      <p style="color: #6c757d; font-size: 0.95rem;">(11:11 samajhke kuch mast sa maangna...)</p>
+      
+      <div class="cake-container" onclick="blowCandle()">
+        <div class="cake-3d">
+          <div class="layer-top">
+            <div class="icing-drip"></div>
+            <div class="candle">
+              <div id="flame" class="flame"></div>
+            </div>
+          </div>
+          <div class="layer-bottom">
+            <div class="icing-drip"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Polaroid Photo Gallery -->
+    <div class="card">
+      <h2>Mast photos toh hai 📸</h2>
+      <div class="gallery">
+        <div class="polaroid">
+          <img src="photo1.jpeg" class="polaroid-img" alt="Memory 1">
+        </div>
+        <div class="polaroid">
+          <img src="photo2.jpeg" class="polaroid-img" alt="Memory 2">
+        </div>
+        <div class="polaroid">
+          <img src="photo3.jpeg" class="polaroid-img" alt="Memory 3">
+        </div>
+        <div class="polaroid">
+          <img src="photo4.jpeg" class="polaroid-img" alt="Memory 4">
+        </div>
+        <div class="polaroid">
+          <img src="photo5.jpeg" class="polaroid-img" alt="Memory 5">
+        </div>
+        <div class="polaroid">
+          <img src="photo6.jpeg" class="polaroid-img" alt="Memory 6">
+        </div>
+        <div class="polaroid centered-last">
+          <img src="photo7.jpeg" class="polaroid-img" alt="Memory 7">
+          <p>and of course the one that started it all...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flippable Reasons Why I Love You -->
+    <div class="card">
+      <h2>Reasons Why I'm Lesbian For YOU' 💌</h2>
+      <p style="color: #6c757d; font-size: 0.9rem; margin-bottom: 10px;">(Click on a card to flip it!)</p>
+      <div class="reasons-grid">
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-front">UNO </div>
+            <div class="flip-back">Dem big googley eyes that stare into my sole. yk, the ones u use to judge me.</div>
+          </div>
+        </div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-front">DOS </div>
+            <div class="flip-back">Mast ramen noodles wale baal</div>
+          </div>
+        </div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-front">TRES </div>
+            <div class="flip-back">Too much sundar aawaz that i dont compliment u enough on</div>
+          </div>
+        </div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-front">QUATRO</div>
+            <div class="flip-back">And of course,ur<br>MI BOMBOGYATTT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Love Letter Envelope -->
+    <div class="card">  
+      <h2>Apke Liye Prem Patrika📝</h2>
+      <div class="envelope">
+        <p>To my sweet baby,</p>
+        <p style="margin-top: 10px;">Happy Birthday my love. Ur finally a buddhi aurat now. I can't believe it's already ur birthday again. Aisa lagta hai ki abhi manaya tha aapka birthday, full shoes wagera deke. Bolte bolte aur ekk saal nikal gaya. And i couldn't have been happier spending every one of those moments with anyone but you. IK this isn't much, but i thought i'd try. Maybe iske chakkar me aap patt jao. YK. Nerd toh tum ho.... TUM HO. Now as i was saying, i love you. I really do. More than i could ever let you know. I know i make my mistakes, and i'm at fault almost all the time, but i need u to be patient with me. Because this is my everything. You are my everything. I want to spend the rest of my days with you. I promise you jaaneman, all the useless arguments and fights rn. It's nothing compared to what we'll have. I pray that we have the life we've dreamt of so many times. There is nothing i want more than THIS. Than US. I've said this before sweetheart, and i'll say it again. But i found my "ONE". And I'm never letting go. We're gonna make it ananya. i promise you.<br> And once again, happy birthday My Love. I hope u enjoy this little gift as much as i enjoyed making it.<br><br> (ps.  gaand fatt gayi banaane me. baap re. idk how u do this.)</p>
+        <p style="text-align: right; margin-top: 20px; font-weight: 600; color: #d63384;">With all my love ❤️</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+
+  <script>
+    // --- CONFIGURE YOUR 3 VALID PASSWORDS HERE ---
+    const VALID_PASSWORDS = ['bananya', 'taklesh', 'motu', 'takleshwar', 'moteshwar'];
+
+    function unlockSite() {
+      const userInput = document.getElementById('passcode-input').value.trim().toLowerCase();
+      
+      if (VALID_PASSWORDS.includes(userInput)) {
+        document.getElementById('lock-screen').classList.add('hidden');
+        document.getElementById('main-site').classList.remove('hidden');
+        
+        // Launch celebratory confetti
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+
+        // Attempt autoplay background music
+        toggleAudio();
+      } else {
+        showToast("Incorrect passcode dum dum 💕");
+      }
+    }
+
+    // Audio Toggle
+    const audio = document.getElementById('bg-music');
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play().then(() => {
+          document.getElementById('audio-label').innerText = "Pause Song";
+        }).catch(() => {
+          showToast("Ensure 'Cigarettes After Sex - Apocalypse (Lyrics)_2.mp3' is in your folder!");
+        });
+      } else {
+        audio.pause();
+        document.getElementById('audio-label').innerText = "Play Song";
+      }
+    }
+
+    // Candle Blowing
+    function blowCandle() {
+      const flame = document.getElementById('flame');
+      if (!flame.classList.contains('hidden')) {
+        flame.classList.add('hidden');
+        confetti({ particleCount: 180, spread: 100, origin: { y: 0.6 } });
+        showToast("Candle blown out! May all your wishes come true ✨");
+      }
+    }
+
+    // Toast Notification
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3200);
+    }
+
+    // Generate Floating Background Hearts
+    const heartsBg = document.getElementById('hearts-bg');
+    for (let i = 0; i < 22; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart-particle';
+      heart.innerText = '❤️';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (6 + Math.random() * 6) + 's';
+      heart.style.animationDelay = (Math.random() * 5) + 's';
+      heartsBg.appendChild(heart);
+    }
+  </script>
+</body>
+</html>
